@@ -92,9 +92,9 @@ def depthFirstSearch(problem):
             for next_state, action, cost in successors: 
                 if next_state not in visited: 
                     new_path = path + [action]
-                    print("new path: ", new_path, " DONE.")
-                    print("next state: ", next_state, " DONE.")
-                    print("state, path: ", next_state, new_path)
+                    #print("new path: ", new_path, " DONE.") # error testing 
+                    #print("next state: ", next_state, " DONE.") # error testing
+                    #print("state, path: ", next_state, new_path) # error testing
                     stack.push((next_state, new_path))
                     
     #print("Start: %s" % (str(problem.startingState())))
