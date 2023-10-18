@@ -95,13 +95,13 @@ def depthFirstSearch(problem):
                     print("new path: ", new_path, " DONE.")
                     print("next state: ", next_state, " DONE.")
                     print("state, path: ", next_state, new_path)
-                    stack.push(next_state, new_path)
+                    stack.push((next_state, new_path))
                     
     #print("Start: %s" % (str(problem.startingState())))
     #print("Is the start a goal?: %s" % (problem.isGoal(problem.startingState())))
     #print("Start's successors: %s" % (problem.successorStates(problem.startingState())))
 
-    #return None # no solution found; right now it is returning NONE we need it to return a path
+    #return None # no solution was found; right now it is returning NONE we need it to return a path
     return path
     raise NotImplementedError()
 
@@ -118,23 +118,23 @@ def breadthFirstSearch(problem):
 
     # *** Your Code Here ***
     queue = Queue()  # the queue for BFS
-    queue.put((problem.startingState(), []))  # initialize the queue with the starting state along w/ an empty list of actions 
+    queue.push((problem.startingState(), []))  # initialize the queue with the starting state along w/ an empty list of actions 
     visited = set()  # create a set to keep track of visited states
 
-    while not queue.empty():
-        state, actions = queue.get()  # get the next state and its corresponding actions
+    while not queue.isEmpty():
+        state, actions = queue.pop()  # get the next state and its corresponding actions
         problem._numExpanded += 1  # increment the expanded node count
         if problem.isGoal(state):
             return actions  # found a solution when the goal state is reached
         if state not in visited:
             visited.add(state)  # mark the state as visited
             successors = problem.successorStates(state)
-            for next_state, action in successors:
+            for next_state, action, cost in successors:
                 if next_state not in visited:
                     new_actions = actions + [action]  # create a new list of actions with the current action
-                    queue.put((next_state, new_actions))  # add the next state and its actions to the queue
+                    queue.push((next_state, new_actions))  # add the next state and its actions to the queue
 
-    return None  # no solution found
+    return None  # no solution was found
     raise NotImplementedError()
 
 
@@ -155,7 +155,6 @@ def uniformCostSearch(problem):
 
     while priority_queue:
         priority, (state, actions) = heapq.heappop(priority_queue)  # get the next state and the corresponding actions with the lowest priority
-        problem._numExpanded += 1  # increment the expanded node count
         if problem.isGoal(state):
             return actions  # found a solution when the goal state is reached
         if state in visited:
@@ -168,7 +167,7 @@ def uniformCostSearch(problem):
                 new_priority = priority + cost  # calculate the new priority
                 heapq.heappush(priority_queue, (new_priority, (next_state, new_actions)))  # add the next state and its actions to the priority queue
 
-    return None  # No solution found.
+    return None  # no solution was found
     raise NotImplementedError()
 
 import heapq
@@ -178,23 +177,23 @@ def aStarSearch(problem, heuristic):
     """
 
     # *** Your Code Here ***
-    priority_queue = []  # Use a priority queue for A*.
-    heapq.heappush(priority_queue, (0 + heuristic(problem.startingState()), (problem.startingState(), [])))  # Initialize the queue with the starting state and an empty list of actions.
-    visited = {}  # Create a dictionary to keep track of visited states and their priorities.
+    priority_queue = []  # use a priority queue for a star 
+    heapq.heappush(priority_queue, (0 + heuristic(problem.startingState(), problem), (problem.startingState(), [])))  # initialize the queue with the starting state and an empty list of actions
+    visited = {}  # create a dict to keep track of visited states and their priorities
 
     while priority_queue:
-        priority, (state, actions) = heapq.heappop(priority_queue)  # Get the next state and its corresponding actions with the lowest priority.
-        problem._numExpanded += 1  # Increment the expanded node count.
+        priority, (state, actions) = heapq.heappop(priority_queue)  # get the next state and its corresponding actions with the lowest priority
+        #problem._numExpanded += 1  # increment the expanded node count
         if problem.isGoal(state):
-            return actions  # Found a solution when the goal state is reached.
+            return actions  # found a solution when the goal state is reached
         if state in visited and priority >= visited[state]:
-            continue  # Skip if the state has been visited with an equal or lower priority.
-        visited[state] = priority  # Mark the state as visited.
+            continue  # skip if the state has been visited with an equal or lower priority
+        visited[state] = priority  # mark the state as visited
         successors = problem.successorStates(state)
         for next_state, action, cost in successors:
-            new_actions = actions + [action]  # Create a new list of actions with the current action.
-            new_priority = problem.actionsCost(new_actions) + heuristic(next_state)  # Calculate the new priority using the heuristic.
-            heapq.heappush(priority_queue, (new_priority, (next_state, new_actions)))  # Add the next state and its actions to the priority queue.
+            new_actions = actions + [action]  # create a new list of actions with the current action
+            new_priority = problem.actionsCost(new_actions) + heuristic(next_state, problem)  # calculate the new priority using the heuristic
+            heapq.heappush(priority_queue, (new_priority, (next_state, new_actions)))  # add the next state and its actions to the priority queue
 
-    return None  # No solution found.
+    return None  # no solution was found
     raise NotImplementedError()
