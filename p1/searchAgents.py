@@ -6,6 +6,7 @@ from pacai.agents.base import BaseAgent
 from pacai.agents.search.base import SearchAgent
 from pacai.core.directions import Directions
 from pacai.core.distance import manhattan, maze
+from queue import Queue
 # from pacai.core.search import heuristic
 # from pacai.core.distance import euclidean
 
@@ -205,6 +206,7 @@ def cornersHeuristic(state, problem):
     # initialize a dict
     distances = {}
     # use to store distances from the current position to unvisited corners
+    # while the corners list is not empty? alt way??
     for corner in unvisited_corners:
         # calculate the manhattan distance
         distance = manhattan(current_position, corner)
@@ -212,7 +214,9 @@ def cornersHeuristic(state, problem):
         distances[corner] = distance
         # print(max(distance))
     # return the maximum distance
-    return max(distances)
+    # return max(distances)
+    return maze(state[0], max(distances, key=distances.get), problem.startingState)
+
     # it's a lower bound on the shortest path
     # return heuristic.null(state, problem)  # Default to trivial solution
 
@@ -295,6 +299,35 @@ class ClosestDotSearchAgent(SearchAgent):
         # problem = AnyFoodSearchProblem(gameState)
 
         # *** Your Code Here ***
+        startState = gameState.getPacmanPosition()
+        food = gameState.getFood()
+        walls = gameState.getWalls()
+        problem = AnyFoodSearchProblem(gameState)
+        # initialize data structure for BFS
+        visited = set()
+        queue = Queue()
+        # add the start state to the queue with an empty path
+        queue.put((startState, []))
+        # while the queue exists
+        while queue:
+            currstate, actions = queue.get()
+            # if the current state is a food dot
+            if food[currstate[0]][currstate[1]]:
+                # return the path
+                return actions
+            if currstate in visited:
+                continue
+            visited.add(currstate)
+            # generate successor states and add them to the queue
+            for action in problem.successorStates(currstate):
+                # unpack the state, _ as placehonder for cost
+                successorstate, actiontosuccessor, _ = action
+                if successorstate not in visited:
+                    if successorstate not in walls[successorstate[0]][successorstate[1]]:
+                        queue.put((successorstate, actions + [actiontosuccessor]))
+        # if no path is found
+        # return an empty list
+        return []
         raise NotImplementedError()
 
 

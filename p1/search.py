@@ -231,6 +231,7 @@ def aStarSearch(problem, heuristic):
                 # print(type(newcost)) # TESTING
                 # print(type(cost)) # TESTING
                 # calcualte the new priority cost using the heurustic
+                # convert cost and newcost to tuples to aviod int to tuple error
                 prioritycost = heuristic(nextstate, problem) + newcost + cost
                 # add the next state and its actions to the priority queue
                 priority_queue.push((nextstate, newactions, prioritycost), prioritycost)
