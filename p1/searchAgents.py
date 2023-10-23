@@ -6,7 +6,7 @@ from pacai.agents.base import BaseAgent
 from pacai.agents.search.base import SearchAgent
 from pacai.core.directions import Directions
 from pacai.core.distance import manhattan, maze
-from queue import Queue
+from pacai.student import search
 # from pacai.core.search import heuristic
 # from pacai.core.distance import euclidean
 
@@ -198,6 +198,13 @@ def cornersHeuristic(state, problem):
     # *** Your Code Here ***
     # are the walls of the maze, in grid
     # the current state
+    # did not have function def for getWalls()
+    def getWalls():
+        walls = problem.walls
+        return walls
+    # point problem to getWalls CITE: Camden group tutor
+    problem.getWalls = getWalls
+    
     current_position, unvisited_corners = state
     # if there are no unvisited corners,
     if not unvisited_corners:
@@ -215,10 +222,9 @@ def cornersHeuristic(state, problem):
         # print(max(distance))
     # return the maximum distance
     # return max(distances)
-    return maze(state[0], max(distances, key=distances.get), problem.startingState)
-
     # it's a lower bound on the shortest path
     # return heuristic.null(state, problem)  # Default to trivial solution
+    return maze(state[0], max(distances, key=distances.get), problem)
 
 def foodHeuristic(state, problem):
     """
@@ -299,6 +305,9 @@ class ClosestDotSearchAgent(SearchAgent):
         # problem = AnyFoodSearchProblem(gameState)
 
         # *** Your Code Here ***
+        problem = AnyFoodSearchProblem(gameState)
+        return search.breadthFirstSearch(problem)
+        '''
         startState = gameState.getPacmanPosition()
         food = gameState.getFood()
         walls = gameState.getWalls()
@@ -328,6 +337,7 @@ class ClosestDotSearchAgent(SearchAgent):
         # if no path is found
         # return an empty list
         return []
+        '''
         raise NotImplementedError()
 
 
@@ -351,6 +361,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         super().__init__(gameState, goal = None, start = start)
         # Store the food for later reference.
         self.food = gameState.getFood()
+
+    def isGoal(self, state):
+        return state in self.food.asList()
 
 
 class ApproximateSearchAgent(BaseAgent):
