@@ -63,6 +63,7 @@ class ReflexAgent(BaseAgent):
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
+        # getScaredTime is the time
         newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
 
         # initialize a score based on the current game state's score
@@ -119,8 +120,23 @@ class MinimaxAgent(MultiAgentSearchAgent):
     and `pacai.agents.search.multiagent.MultiAgentSearchAgent.getEvaluationFunction`.
     """
 
+    # you can have a max amount of 4 agents
+    # this will be you and three ghosts DO NOT HARDCOE THIS, it will change
+    # one turn in minimaz has a depth of 1, at the end, depth of 4
     def __init__(self, index, **kwargs):
+        # mean that you are inheriting from another class
+        # **kwargs means that it takes in the name and the variable argument
         super().__init__(index, **kwargs)
+
+    def getAction(self, gameState):
+        totalDepth = self.getTreeDepth()
+        # TESTING to check tree depth
+        # print(totalDepth)
+        # take out return later
+        return totalDepth
+
+    def getEvaluationFunction():
+        pass
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
