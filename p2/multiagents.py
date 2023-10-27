@@ -29,10 +29,9 @@ class ReflexAgent(BaseAgent):
         `pacai.core.directions.Directions`.
         """
 
-        # Collect legal moves.
+        # collect legal moves.
         legalMoves = gameState.getLegalActions()
-
-        # Choose one of the best actions.
+        # choose one of the best actions.
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
@@ -66,10 +65,8 @@ class ReflexAgent(BaseAgent):
         newGhostStates = successorGameState.getGhostStates()
         # getScaredTime is the time
         newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
-
         # initialize a score based on the current game state's score
         score = successorGameState.getScore()
-
         # calculate distances to the closest food pellet
         foodDistances = [manhattan(newPos, food) for food in newFood.asList()]
         if foodDistances:
@@ -77,7 +74,6 @@ class ReflexAgent(BaseAgent):
             # add a positive score for being closer to the food
             # the reciprocal of the distance is used here???
             score += 1.0 / closestFoodDistance
-
         # avoid ghosts if they are not scared, and approach them if they are
         for ghost, scaredTime in zip(newGhostStates, newScaredTimes):
             ghostPos = ghost.getPosition()
@@ -89,7 +85,6 @@ class ReflexAgent(BaseAgent):
             # approach it (positive score)
             elif scaredTime > 0 and manhattan(newPos, ghostPos) < 2:
                 score += 500  # approach scared ghosts
-
         return score
 
         return successorGameState.getScore()
@@ -161,13 +156,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 bestAction = action
             return bestAction
         
-    def maxValue(self, state, depth):
+    def maxValue(self, state, depth, ghostIndex):
         # going from bottom up, hence decrement the depth
-        depth -= 1
         # base case #1: tree depth reached
         # base case #2: if you win
         # base case #3: if you loose
-        if depth >= self.depth or state.isWin() or state.isLose():
+        # prev. if depth >= self.depth
+        if depth <= 0 or state.isWin() or state.isLose():
             # if we've reached the specified depth or a terminal state (win or lose)
             # return the state's evaluation.
             return self.getEvaluationFunction()(state)
@@ -177,10 +172,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for action in legalActions:
             successorState = state.generateSuccessor(0, action)
             # call minValue for the first ghost.
-            value = self.minValue(successorState, 1, depth)
+            value = self.minValue(successorState, depth - 1, ghostIndex)
             # update the best value with the maximum value.
             bestValue = max(bestValue, value)
-        return legalActions
+        return bestValue
 
     def minValue(self, state, ghostIndex, depth):
         '''
@@ -200,14 +195,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # initialize the best value to positive infinity.
         bestValue = float('inf')
         for action in legalActions:
-            if ghostIndex == state.getNumAgents() - 1:
+            if ghostIndex == (state.getNumAgents() - 1):
                 # if this is the last ghost, call maxValue for pacman
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = self.maxValue(successorState, depth + 1)
+                value = self.maxValue(successorState, depth - 1, 0)
             else:
                 # call minValue for the next ghost.
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = self.minValue(successorState, ghostIndex + 1, depth)
+                value = self.maxValue(successorState, depth, ghostIndex + 1)
             # update the best value with the minimum value.
             bestValue = min(bestValue, value)
         return bestValue
