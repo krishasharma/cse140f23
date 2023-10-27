@@ -177,7 +177,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             bestValue = max(bestValue, value)
         return bestValue
 
-    def minValue(self, state, ghostIndex, depth):
+    def minValue(self, state, depth, ghostIndex):
         '''
         if depth >= self.depth or state.isWin() or state.isLose():
             # if we've reached the specified depth or a terminal state (win or lose)
@@ -187,7 +187,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # use modulo check and increment the turn
         # REVISIT MODULO IN PYTHON
         # check if you have won or lost
-        if state.isWin() or state.isLose():
+        if depth <= 0 or state.isWin() or state.isLose():
             # if we've reached the specified depth or a terminal state (win or lose)
             # return the state's evaluation.
             return self.getEvaluationFunction()(state)
@@ -202,7 +202,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             else:
                 # call minValue for the next ghost.
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = self.maxValue(successorState, depth, ghostIndex + 1)
+                value = self.minValue(successorState, depth, (ghostIndex + 1) % state.getNumAgents())
             # update the best value with the minimum value.
             bestValue = min(bestValue, value)
         return bestValue
