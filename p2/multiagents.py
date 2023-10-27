@@ -3,6 +3,7 @@ import random
 from pacai.agents.base import BaseAgent
 from pacai.agents.search.multiagent import MultiAgentSearchAgent
 from pacai.core.distance import manhattan
+from pacai.core.directions import Directions
 
 class ReflexAgent(BaseAgent):
     """
@@ -127,16 +128,89 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # mean that you are inheriting from another class
         # **kwargs means that it takes in the name and the variable argument
         super().__init__(index, **kwargs)
-
+        # there is no depth given, create one
+    
+    '''
     def getAction(self, gameState):
         totalDepth = self.getTreeDepth()
         # TESTING to check tree depth
         # print(totalDepth)
         # take out return later
-        return totalDepth
+        # call the first pass through of the min max exchange
+        newstate =
+        value = self.maxValue(gameState)
+    '''
 
-    def getEvaluationFunction():
-        pass
+    def getAction(self, state):
+        # here state is the game state??? CHECK THIS KAI
+        # totalDepth = self.getTreeDepth()
+        # get the legal actions for Pac-Man (agent 0).
+        legalActions = state.getLegalActions(0)
+        # initialize the best action and best value.
+        bestAction = Directions.STOP
+        bestValue = float('-inf')
+        # iterate through legal actions and find the one with the maximum value.
+        for action in legalActions:
+            successorState = state.generateSuccessor(0, action)
+            # start with ghost 1 at depth 0.
+            # create a new state
+            value = self.minValue(successorState, 1, 0)
+            if value > bestValue:
+                bestValue = value
+                # change the action score if better
+                bestAction = action
+            return bestAction
+        
+    def maxValue(self, state, depth):
+        # going from bottom up, hence decrement the depth
+        depth -= 1
+        # base case #1: tree depth reached
+        # base case #2: if you win
+        # base case #3: if you loose
+        if depth >= self.depth or state.isWin() or state.isLose():
+            # if we've reached the specified depth or a terminal state (win or lose)
+            # return the state's evaluation.
+            return self.getEvaluationFunction()(state)
+        legalActions = state.getLegalActions(0)
+        # initialize the best value to negative infinity.
+        bestValue = float('-inf')
+        for action in legalActions:
+            successorState = state.generateSuccessor(0, action)
+            # call minValue for the first ghost.
+            value = self.minValue(successorState, 1, depth)
+            # update the best value with the maximum value.
+            bestValue = max(bestValue, value)
+        return legalActions
+
+    def minValue(self, state, ghostIndex, depth):
+        '''
+        if depth >= self.depth or state.isWin() or state.isLose():
+            # if we've reached the specified depth or a terminal state (win or lose)
+            # return the state's evaluation.
+            return self.getEvaluationFunction()(state)
+        '''
+        # use modulo check and increment the turn
+        # REVISIT MODULO IN PYTHON
+        # check if you have won or lost
+        if state.isWin() or state.isLose():
+            # if we've reached the specified depth or a terminal state (win or lose)
+            # return the state's evaluation.
+            return self.getEvaluationFunction()(state)
+        legalActions = state.getLegalActions(ghostIndex)
+        # initialize the best value to positive infinity.
+        bestValue = float('inf')
+        for action in legalActions:
+            if ghostIndex == state.getNumAgents() - 1:
+                # if this is the last ghost, call maxValue for pacman
+                successorState = state.generateSuccessor(ghostIndex, action)
+                value = self.maxValue(successorState, depth + 1)
+            else:
+                # call minValue for the next ghost.
+                successorState = state.generateSuccessor(ghostIndex, action)
+                value = self.minValue(successorState, ghostIndex + 1, depth)
+            # update the best value with the minimum value.
+            bestValue = min(bestValue, value)
+        return bestValue
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -149,7 +223,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     `pacai.agents.search.multiagent.MultiAgentSearchAgent.getTreeDepth`
     and `pacai.agents.search.multiagent.MultiAgentSearchAgent.getEvaluationFunction`.
     """
-
+    
+    # according to batu:
+    # alpha beta only needs 4-5 lines added
+    # other than that it is the same as minimax
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
 
