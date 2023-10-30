@@ -137,7 +137,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def myLegalActions(self, state, agentid):
         # copyactions = state.getLegalActions(agentid)
-        # for copyactions in actions: 
         # list of [east, stop, east] for ex.
         actions = state.getLegalActions(agentid)
         if actions == Directions.STOP or 'Stop':
@@ -145,28 +144,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return actions
 
     def getAction(self, state):
+        # starts the search and selects best action for pac-man
         # here state is the game state??? CHECK THIS KAI
         # totalDepth = self.getTreeDepth()
         # get the legal actions for Pac-Man (agent 0).
         legalActions = self.myLegalActions(state, 0)
         # initialize the best action and best value.
         bestAction = Directions.STOP
-        bestValue = float('-inf')
+        value = float('-inf')
         # iterate through legal actions and find the one with the maximum value.
         for action in legalActions:
             # print("Actions", legalActions)
             successorState = state.generateSuccessor(0, action)
             # start with ghost 1 at depth 0.
             # create a new state
-            value = self.maxValue(successorState, self.getTreeDepth())
-            if value > bestValue:
-                bestValue = value
+            newvalue = max(value, self.maxValue(successorState, self.getTreeDepth()))
+            if newvalue > value:
+                # bestValue = value
                 # change the action score if better
+                value = newvalue
                 bestAction = action
-            print("best actoin: ", bestAction)
+            # print("best action: ", bestAction)
             return bestAction
-        
-    def maxValue(self, state, depth): # had ghost index included
+
+    def maxValue(self, state, depth):
+        # had ghost index included
         # going from bottom up, hence decrement the depth
         # base case #1: tree depth reached
         # base case #2: if you win
@@ -179,15 +181,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
         depth = depth - 1
         legalActions = self.myLegalActions(state, 0)
         # initialize the best value to negative infinity.
-        bestValue = float('-inf')
+        value = float('-inf')
         for action in legalActions:
             successorState = state.generateSuccessor(0, action)
             # call minValue for the first ghost.
             # had ghost index-- hardcoded to 1
-            value = self.minValue(successorState, depth, 1)
+            value = max(value, self.minValue(successorState, depth, 1))
             # update the best value with the maximum value.
-            bestValue = max(bestValue, value)
-        return bestValue
+            # value = max(value)
+        return value
 
     def minValue(self, state, depth, ghostIndex):
         '''
@@ -199,26 +201,25 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # use modulo check and increment the turn
         # REVISIT MODULO IN PYTHON
         # check if you have won or lost
-        if depth <= 0 or state.isWin() or state.isLose(): 
+        if depth <= 0 or state.isWin() or state.isLose():
             # if we've reached the specified depth or a terminal state (win or lose)
             # return the state's evaluation.
             return self.getEvaluationFunction()(state)
         legalActions = state.getLegalActions(ghostIndex)
         # initialize the best value to positive infinity.
-        bestValue = float('inf')
+        value = float('inf')
         for action in legalActions:
             if ghostIndex == (state.getNumAgents() - 1):
                 # if this is the last ghost, call maxValue for pacman
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = self.maxValue(successorState, depth - 1)
+                value = min(value, self.maxValue(successorState, depth - 1))
             else:
                 # call minValue for the next ghost.
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = self.minValue(successorState, depth, ghostIndex + 1) #<--This modulo could be somewhere else.
-                #(ghostIndex + 1) % state.getNumAgents()
+                value = min(value, self.minValue(successorState, depth, ghostIndex + 1))
+                # (ghostIndex + 1) % state.getNumAgents()
             # update the best value with the minimum value.
-            bestValue = min(bestValue, value)
-        return bestValue
+        return value
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
