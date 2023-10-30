@@ -239,6 +239,56 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
 
+    def getAction(self, state, depth = 4):
+        # get the legal actions for pacman (agent 0)
+        legalActions = state.getLegalActions(0)
+        bestAction = Directions.STOP
+        # initialize alpha to negative infinity
+        alpha = float('-inf')
+        # initialize beta to poisitve infinity
+        beta = float("inf")
+        for action in legalActions:
+            sucessorState = state.generateSuccessor(0, action)
+            value = self.minValue(sucessorState, depth - 1, 1, alpha, beta)
+            if value > alpha:
+                alpha = value
+                bestAction = action
+        return bestAction
+    
+    def maxValue(self, state, depth, ghostIndex, alpha, beta):
+        # maximizer function for pacman
+        if depth <= 0 or state.isWin() or state.isLose():
+            return self.getEvaluationFunction()(state)
+        legalActions = state.getLegalActions(0)
+        value = float('-inf')
+        for action in legalActions:
+            successorState = state.generateSuccessor(0, action)
+            value = max(value, self.minValue(successorState, depth - 1, 1, alpha, beta))
+            if value >= beta:
+                # prune the rest of the branches
+                return value
+            alpha = max(alpha, value)
+        return value
+
+    def minValue(self, state, depth, ghostIndex, alpha, beta):
+        # minimizer function for the ghosts
+        if depth <= 0 or state.isWin() or state.isLose():
+            return self.getEvaluationFunction()(state)
+        legalActions = state.getLegalActions(ghostIndex)
+        value = float('inf')
+        for action in legalActions:
+            if ghostIndex == (state.getNumAgents() - 1):
+                successorState = state.generateSuccessor(ghostIndex, action)
+                value = min(value, self.maxValue(successorState, depth - 1, 0, alpha, beta))
+            else:
+                successorState = state.generateSuccessor(ghostIndex, action)
+                value = min(value, self.minValue(successorState, depth, ghostIndex + 1, alpha, beta))
+            if value <= alpha:
+                # prune the rest of the branches
+                return value
+            beta = min(beta, value)
+        return value
+
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
     An expectimax agent.
