@@ -406,7 +406,7 @@ def betterEvaluationFunction(currentGameState):
         # adjust the evaluation based on ghost proximity
         evaluation += ghostWeight / nearestGhostDistance
     return evaluation
-    return currentGameState.getScore()
+    # return currentGameState.getScore()
 
 class ContestAgent(MultiAgentSearchAgent):
     """
