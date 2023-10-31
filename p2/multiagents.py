@@ -282,7 +282,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 value = min(value, self.maxValue(successorState, depth - 1, 0, alpha, beta))
             else:
                 successorState = state.generateSuccessor(ghostIndex, action)
-                value = min(value, self.minValue(successorState, depth, ghostIndex + 1, alpha, beta))
+                value = min(value, self.minValue(successorState, depth, ghostIndex + 1,
+                                                 alpha, beta))
             if value <= alpha:
                 # prune the rest of the branches
                 return value
@@ -305,6 +306,54 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
+
+    def getAction(self, state):
+        # start the search and select the best action for pacman
+        # get the legal actions for pacman (agent 0)
+        legalActions = state.getLegalActions(0)
+        # initialize the best action and best value
+        bestAction = None
+        bestValue = float('-inf')
+        for action in legalActions:
+            # generate the successor state for each action
+            successorState = state.generateSuccessor(0, action)
+            # start the expectimax search for ghosts
+            value = self.expectimax(successorState, self.getTreeDepth(), 1)
+            # if the value for this action is better, update the best action and value
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+        return bestAction
+
+    def expectimax(self, state, depth, agentIndex):
+        # base case: if the depth limit is reached or the game is over,
+        if depth == 0 or state.isWin() or state.isLose():
+            # return the evaluation
+            return self.getEvaluationFunction()(state)
+        # pacman's turn
+        if agentIndex == 0:
+            legalActions = state.getLegalActions(agentIndex)
+            bestValue = float('-inf')
+            for action in legalActions:
+                successorState = state.generateSuccessor(agentIndex, action)
+                # continue the expectimax search with the next agent (ghost)
+                value = self.expectimax(successorState, depth, agentIndex + 1)
+                # update the best value for pacman (max value)
+                bestValue = max(bestValue, value)
+            return bestValue
+        # ghosts' turn (expectation)
+        else:
+            legalActions = state.getLegalActions(agentIndex)
+            totalValue = 0
+            for action in legalActions:
+                successorState = state.generateSuccessor(agentIndex, action)
+                # continue the expectimax search with the next agent
+                value = self.expectimax(successorState, depth, (agentIndex + 1) %
+                                        state.getNumAgents())
+                # accumulate the values for each ghost move
+                totalValue += value
+            # return the average value for the ghost's moves (expectation)
+            return totalValue / len(legalActions)
 
 def betterEvaluationFunction(currentGameState):
     """
