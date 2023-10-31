@@ -361,7 +361,51 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
     """
+    """
+    Improved evaluation function for Pac-Man without considering power pills.
 
+    DESCRIPTION: This evaluation function focuses on other important factors to make Pac-Man
+    perform better. It considers the following:
+    1. Current score: Pac-Man's current score reflects his progress, so we want to maximize it.
+    2. Remaining food: The number of remaining food dots is a crucial factor. We want to
+       prioritize eating remaining food.
+    3. Capsules: Eating capsules can make Pac-Man fearless, so we consider them in the evaluation.
+    4. Ghosts: We want to avoid ghosts as much as possible. The distance to the nearest ghost is
+       inversely proportional to the evaluation.
+
+    We use a weighted sum of these factors to evaluate the current state, but we return
+    currentGameState.getScore() as the final evaluation.
+    """
+    
+    # get the game state data
+    gameState = currentGameState
+    # extract relevant information
+    score = gameState.getScore()
+    pacmanPosition = gameState.getPacmanState().getPosition()
+    food = gameState.getFood().asList()
+    remainingFood = len(food)
+    capsules = gameState.getCapsules()
+    ghosts = gameState.getGhostStates()
+    # initialize the evaluation score with the current score
+    evaluation = score
+    # weight factors for the evaluation components
+    foodWeight = 10
+    capsuleWeight = 5
+    ghostWeight = -20
+    # update the evaluation based on the factors
+    evaluation += remainingFood * foodWeight
+    evaluation += len(capsules) * capsuleWeight
+    # calculate the proximity to the nearest ghost
+    ghostDistances = [manhattan(pacmanPosition, ghost.getPosition()) for ghost in ghosts]
+    nearestGhostDistance = min(ghostDistances)
+    # avoid division by zero by handling the case when nearestGhostDistance is zero
+    if nearestGhostDistance == 0:
+        # a large negative value to indicate extreme undesirability
+        ghostWeight = -float('inf')
+    else:
+        # adjust the evaluation based on ghost proximity
+        evaluation += ghostWeight / nearestGhostDistance
+    return evaluation
     return currentGameState.getScore()
 
 class ContestAgent(MultiAgentSearchAgent):
