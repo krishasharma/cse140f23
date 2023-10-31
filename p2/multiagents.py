@@ -48,7 +48,6 @@ class ReflexAgent(BaseAgent):
         Make sure to understand the range of different values before you combine them
         in your evaluation function.
         """
-
         # Useful information you can extract.
         # newPosition = successorGameState.getPacmanPosition()
         # oldFood = currentGameState.getFood()
@@ -156,7 +155,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for action in legalActions:
             # print("Actions", legalActions)
             successorState = state.generateSuccessor(0, action)
-            # start with ghost 1 at depth 0.
+            # start with ghost 1 at depth 0
             # create a new state
             newvalue = max(value, self.maxValue(successorState, self.getTreeDepth()))
             if newvalue > value:
@@ -186,9 +185,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             successorState = state.generateSuccessor(0, action)
             # call minValue for the first ghost.
             # had ghost index-- hardcoded to 1
-            value = max(value, self.minValue(successorState, depth, 1))
+            newvalue = max(value, self.minValue(successorState, depth - 1, 1))
             # update the best value with the maximum value.
             # value = max(value)
+            if newvalue > value:
+                value = newvalue
         return value
 
     def minValue(self, state, depth, ghostIndex):
@@ -362,18 +363,17 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     """
-    Improved evaluation function for Pac-Man without considering power pills.
-
-    DESCRIPTION: This evaluation function focuses on other important factors to make Pac-Man
-    perform better. It considers the following:
-    1. Current score: Pac-Man's current score reflects his progress, so we want to maximize it.
-    2. Remaining food: The number of remaining food dots is a crucial factor. We want to
+    improved evaluation function for pacman
+    DESCRIPTION: this evaluation function focuses on other important factors to make pacman
+    perform better. it considers the following:
+    1. current score: pacman's current score reflects his progress, so we want to maximize it.
+    2. remaining food: the number of remaining food dots is a crucial factor. we want to
        prioritize eating remaining food.
-    3. Capsules: Eating capsules can make Pac-Man fearless, so we consider them in the evaluation.
-    4. Ghosts: We want to avoid ghosts as much as possible. The distance to the nearest ghost is
+    3. capsules: eating capsules can make pacman fearless, so we consider them in the evaluation.
+    4. ghosts: we want to avoid ghosts as much as possible. the distance to the nearest ghost is
        inversely proportional to the evaluation.
 
-    We use a weighted sum of these factors to evaluate the current state, but we return
+    we use a weighted sum of these factors to evaluate the current state, but we return
     currentGameState.getScore() as the final evaluation.
     """
     
