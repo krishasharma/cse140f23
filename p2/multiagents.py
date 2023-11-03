@@ -305,7 +305,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         value = float('-inf')
         # initialize max to negative infinity
         # both are initialized to the worst possible case
-        max = float('inf')
+        max = float('-inf')
         # iterate through legal action and go through each actio
         for action in legalActions:
             # generate the successor state for pacman
@@ -326,7 +326,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             # return the state's evaluation
             return self.getEvaluationFunction()(state)
         # pacman's turn
-         # get the legal actions at index 0
+        # get the legal actions at index 0
         legalActions = state.getLegalActions(ghostIndex)
         # initialize value to negative infinity
         # set to the worst case
@@ -381,69 +381,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         # return the average value for the ghost's moves (expectation)
         return totalValue / len(legalActions)
 
-    '''
-    def expectimax(self, state, depth, ghostIndex):
-        # the expectation is based on my agent's model of how the ghosts act
-        # if we have reached the specified depth or a terminal state (win or lose)
-        if depth <= 0 or state.isWin() or state.isLose():
-            # return the state's evaluation
-            return self.getEvaluationFunction()(state)
-        # pacman's turn
-        # if it is pacmans turn (index 0)
-        if ghostIndex == 0:
-            # get the legal actions at index 0
-            legalActions = state.getLegalActions(ghostIndex)
-            # initialize value to negative infinity
-            # set to the worst case
-            value = float('-inf')
-            bestValue = float('-inf')
-            # handle/remove the STOP action
-            legalActions.remove('Stop')
-            # iterate through the legal actions and go through each action
-            for action in legalActions:
-                # KAIA CHECK: do we want to index agentIndex for every action?
-                # agentIndex = agentIndex + 1
-                # generate the successor for pacman at index 0
-                successorState = state.generateSuccessor(ghostIndex, action)
-                # continue the expectimax search with the next agent (ghost)
-                # decrement depth??? was just depth changing to depth - 1
-                value = self.expectimax(successorState, depth - 1, ghostIndex + 1)
-                # call and update value with the max value at index 1
-                bestValue = max(bestValue, value)
-            return bestValue
-        # ghosts' turn (expectation)
-        # else if it is the ghost's turn
-        else:
-            # get the legal actions for the current ghost
-            legalActions = state.getLegalActions(ghostIndex)
-            # initialize value to positive infinity
-            # set value to the worst possible case for min
-            value = float('inf')
-            totalValue = 0
-            # iterate through legal actions and go through each action
-            for action in legalActions:
-                # if this is not the last ghost
-                # get the max for pacman
-                if ghostIndex == (state.getNumAgents() - 1):
-                    # generate the successor state
-                    successorState = state.generateSuccessor(ghostIndex, action)
-                    # get the minimizing value and update
-                    value = min(value, self.expectimax(successorState, depth - 1, 0))
-                    # accumulate the values for the pacman moves
-                    totalValue += value
-                # else call min for the next ghost
-                else:
-                    # generate the successor state
-                    successorState = state.generateSuccessor(ghostIndex, action)
-                    # call the minimizing value and update
-                    # continue the expectimax search with the next agent
-                    value = self.expectimax(successorState, depth, ghostIndex + 1)
-                    # accumulate the values for each ghost move
-                    totalValue += value
-            # return the average value for the ghost's moves (expectation)
-            return totalValue / len(legalActions)
-            return value
-        '''
 
 def betterEvaluationFunction(currentGameState):
     """
