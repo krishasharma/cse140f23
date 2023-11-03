@@ -116,7 +116,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     # you can have a max amount of 4 agents
     # this will be you and three ghosts DO NOT HARDCOE THIS, it will change
-    # one turn in minimaz has a depth of 1, at the end, depth of 4
+    # one turn in minimax has a depth of 1, at the end, depth of 4
     def __init__(self, index, **kwargs):
         # mean that you are inheriting from another class
         # **kwargs means that it takes in the name and the variable argument
@@ -132,56 +132,81 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return actions
 
     def getAction(self, state):
+        # starts the search and selects the best action for pacman
         # get the legal actions for pacman (agent 0)
         totalDepth = self.getTreeDepth()
         legalActions = state.getLegalActions(0)
         bestAction = Directions.STOP
         # initialize value to negative infinity
         value = float('-inf')
+        # initialize max to negative infinity
+        # both are initialized to the worst case
         max = float('-inf')
+        # remove/handle STOP action
         legalActions.remove("Stop")
-        # initialize max to poisitve infinity
+        # iterate through legal actions and go through each action
+        # find the one with the minimum value
         for action in legalActions:
+            # generate the successor for pacman
             sucessorState = state.generateSuccessor(0, action)
+            # start with ghost 1 at depth 1
+            # create a new state
             value = self.minValue(sucessorState, totalDepth - 1, 1)
-            if value >= max: 
-                max = value 
+            if value >= max:
+                max = value
                 bestAction = action
         return bestAction
         pass
         
     def maxValue(self, state, depth, ghostIndex):
         # maximizer function for pacman
+        # if we've reached the specified depth or a terminal state (win or lose)
         if depth <= 0 or state.isWin() or state.isLose():
+            # return the state's evaluation
             return self.getEvaluationFunction()(state)
         legalActions = state.getLegalActions(0)
+        # initialize value to negative infinity
+        # set to the worst case
         value = float('-inf')
+        # handle/remove STOP action
         legalActions.remove('Stop')
+        # iterate through legal actions and go through each action
         for action in legalActions:
+            # generate the successor
             successorState = state.generateSuccessor(0, action)
+            # call min value for the first ghost
+            # call and update the value with max value
             value = max(value, self.minValue(successorState, depth - 1, 1))
         return value
-        pass 
+        pass
 
     def minValue(self, state, depth, ghostIndex):
         # minimizer function for the ghosts
+        # if we've reached the specified depth or a terminal state (win or lose)
         if depth <= 0 or state.isWin() or state.isLose():
+            # return the state's evaluation
             return self.getEvaluationFunction()(state)
         legalActions = state.getLegalActions(ghostIndex)
+        # initialize value to positive infinity
+        # set value to the worst possible case for min
         value = float('inf')
+        # iterate through legal actions and go through each action
         for action in legalActions:
-            # if last ghost 
-            # get max for pac man 
+            # if this is not the last ghost
+            # get max for pacman
             if ghostIndex == (state.getNumAgents() - 1):
+                # generate the successor state
                 successorState = state.generateSuccessor(ghostIndex, action)
+                # get the minimizing value and update
                 value = min(value, self.maxValue(successorState, depth - 1, 0))
-            # if not last ghost 
-            # move to next ghost 
+            # else call min for the next ghost
             else:
+                # generate the successor state
                 successorState = state.generateSuccessor(ghostIndex, action)
+                # call the minimizing value and update
                 value = min(value, self.minValue(successorState, depth, ghostIndex + 1))
         return value
-        pass 
+        pass
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
