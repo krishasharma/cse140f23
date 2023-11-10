@@ -1,5 +1,7 @@
 from pacai.agents.learning.reinforcement import ReinforcementAgent
 from pacai.util import reflection
+from pacai.util.probability import flipCoin
+import random
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -43,9 +45,22 @@ class QLearningAgent(ReinforcementAgent):
     """
 
     def __init__(self, index, **kwargs):
-        super().__init__(index, **kwargs)
+        """
+        initialize the Q-Learning agent.
 
-        # You can initialize Q-values here.
+        args:
+            index: the agent index
+            alpha: the learning rate (default is 0.5)
+            epsilon: the exploration rate (default is 0.5)
+            gamma: the discount factor (default is 0.9)
+            numTraining: the number of training episodes (default is 100)
+            **kwargs: additional keyword arguments
+        """
+
+        # inherits from reinforcment agent
+        super().__init__(index, **kwargs)
+        # q values are stored in the dictionary, which maps state-action pairs
+        self.qValues = {}  # dictionary to store Q-values
 
     def getQValue(self, state, action):
         """
@@ -53,7 +68,20 @@ class QLearningAgent(ReinforcementAgent):
         and `pacai.core.directions.Directions`.
         Should return 0.0 if the (state, action) pair has never been seen.
         """
+        # need to keep track of q values 
+        """
+        get the Q-Value for a state-action pair
 
+        args:
+            state: The current state
+            action: The action taken in the current state
+
+        returns:
+            The Q-value for the (state, action) pair
+        """
+
+        # retruves the q value for any given state 
+        return self.qValues.get((state, action), 0.0)
         return 0.0
 
     def getValue(self, state):
@@ -68,7 +96,21 @@ class QLearningAgent(ReinforcementAgent):
         which returns the actual best action.
         Whereas this method returns the value of the best action.
         """
+        """
+        return the value of the best action in a state
 
+        args:
+            state: the current state
+
+        returns:
+            the value of the best action in the given state
+        """
+
+        legalActions = self.getLegalActions(state)
+        if not legalActions:
+            return 0.0
+        # choose the action with the maximum Q-value
+        return max(self.getQValue(state, action) for action in legalActions)
         return 0.0
 
     def getPolicy(self, state):
@@ -83,8 +125,57 @@ class QLearningAgent(ReinforcementAgent):
         which returns the value of the best action.
         Whereas this method returns the best action itself.
         """
+        """
+        return the best action in a state
 
+        args:
+            state: the current state
+
+        returns:
+            the best action in the given state
+        """
+
+        legalActions = self.getLegalActions(state)
+        if not legalActions:
+            return None
+        # choose the action with the maximum Q-value
+        bestActions = [action for action in legalActions if self.getQValue(state, action) == self.getValue(state)]
+        return random.choice(bestActions)
         return None
+    
+    def getAction(self, state):
+        """
+        compute the action to take in the current state
+
+        returns:
+            the action to take
+        """
+
+        legalActions = self.getLegalActions(state)
+        if not legalActions:
+            return None
+        # with probability epsilon, choose a random action
+        if flipCoin(self.epsilon):
+            return random.choice(legalActions)
+        else:
+            # otherwise, choose the action with the maximum Q-value
+            return self.getPolicy(state)
+
+    def update(self, state, action, nextState, reward):
+        """
+        update the Q-value for a state-action pair
+
+        args:
+            state: the current state
+            action: the action taken in the current state
+            nextState: the next state
+            reward: the immediate reward
+        """
+
+        # calculate the Q-value update using the Q-learning formula
+        sample = reward + self.getDiscountRate() * self.getValue(nextState)
+        self.qValues[(state, action)] = (1 - self.getAlpha()) * self.getQValue(state, action) + self.getAlpha() * sample
+
 
 class PacmanQAgent(QLearningAgent):
     """
