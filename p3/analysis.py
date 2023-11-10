@@ -13,9 +13,11 @@ def question2():
     """
     [Enter a description of what you did here.]
     """
+    # play around with discount and noise to make it go from 
+    # 
 
     answerDiscount = 0.9
-    answerNoise = 0.2
+    answerNoise = 0.000002
 
     return answerDiscount, answerNoise
 
