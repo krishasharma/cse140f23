@@ -13,9 +13,8 @@ def question2():
     """
     [Enter a description of what you did here.]
     """
-    # play around with discount and noise to make it go from 
-    # 
 
+    # play around with discount and noise to make it go from
     answerDiscount = 0.9
     answerNoise = 0.000002
 
@@ -24,43 +23,58 @@ def question2():
 def question3a():
     """
     [Enter a description of what you did here.]
+
+    prefer the close exit (+1), risking the cliff (-10)
     """
 
-    answerDiscount = 0.9
+    # lower discount to prefer immediate rewards
+    answerDiscount = 0.1
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    # higher negative living reward to discourage lingering
+    answerLivingReward = -10.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
 def question3b():
     """
     [Enter a description of what you did here.]
+    
+    prefer the close exit (+1), but avoiding the cliff (-10)
     """
 
-    answerDiscount = 0.9
+    # lower discount to prefer immediate rewards
+    answerDiscount = 0.1
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    # slightly higher negative living reward to encourage avioding the cliff
+    answerLivingReward = -1.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
 def question3c():
     """
     [Enter a description of what you did here.]
+
+    prefer the distant exit (+10), risking the cliff (-10)
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    # higher negative living reward to discourage lingering
+    answerLivingReward = -10.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
 def question3d():
     """
     [Enter a description of what you did here.]
+
+    prefer the distant exit (+10), avoiding the cliff (-10)
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
+    # slightly higher negative living reward to encourage avioding the cliff
+    # -1.0 ???
     answerLivingReward = 0.0
 
     return answerDiscount, answerNoise, answerLivingReward
@@ -68,17 +82,23 @@ def question3d():
 def question3e():
     """
     [Enter a description of what you did here.]
+
+    avoid both exits (also avoiding the cliff)
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
     answerLivingReward = 0.0
-
+    # return NOT_POSSIBLE
     return answerDiscount, answerNoise, answerLivingReward
 
 def question6():
     """
     [Enter a description of what you did here.]
+
+    train a completely random q-learner with the default learning rate
+    on the noiseless BridgeGrid for 50 episodes
+    and observe whether it finds the optimal policy.
     """
 
     answerEpsilon = 0.3

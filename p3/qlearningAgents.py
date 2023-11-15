@@ -68,7 +68,7 @@ class QLearningAgent(ReinforcementAgent):
         and `pacai.core.directions.Directions`.
         Should return 0.0 if the (state, action) pair has never been seen.
         """
-        # need to keep track of q values 
+        # need to keep track of q values
         """
         get the Q-Value for a state-action pair
 
@@ -80,7 +80,8 @@ class QLearningAgent(ReinforcementAgent):
             The Q-value for the (state, action) pair
         """
 
-        # retruves the q value for any given state 
+        # retrives the q value for any given state-action pair from the dict
+        # if pair not seen, returns default val of 0.0
         return self.qValues.get((state, action), 0.0)
         return 0.0
 
@@ -107,9 +108,12 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         legalActions = self.getLegalActions(state)
+        # if there are no legal actions in the current state (the terminal state)
         if not legalActions:
+            # if not return 0
             return 0.0
-        # choose the action with the maximum Q-value
+        # choose the action with the maximum Q-value among all the legal actions
+        # return the best action of the given state
         return max(self.getQValue(state, action) for action in legalActions)
         return 0.0
 
@@ -136,10 +140,14 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         legalActions = self.getLegalActions(state)
+        # if there are no legal actions
         if not legalActions:
+            # return none
             return None
         # choose the action with the maximum Q-value
-        bestActions = [action for action in legalActions if self.getQValue(state, action) == self.getValue(state)]
+        bestActions = [action for action in legalActions
+                       if self.getQValue(state, action) == self.getValue(state)]
+        # if there are ties, randomly select one
         return random.choice(bestActions)
         return None
     
@@ -152,6 +160,7 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         legalActions = self.getLegalActions(state)
+        # if there are no legal actions
         if not legalActions:
             return None
         # with probability epsilon, choose a random action

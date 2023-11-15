@@ -64,7 +64,7 @@ class ValueIterationAgent(ValueEstimationAgent):
                     if not possibleActions:
                         # if there are no legal actions in the current state, skip to next state
                         continue
-                    # check if there are legal actions?? 
+                    # check if there are legal actions??
                     # initialize max q value to large negative number
                     # the worst case???
                     maxQValue = float('-inf')
