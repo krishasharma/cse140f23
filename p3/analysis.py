@@ -28,10 +28,10 @@ def question3a():
     """
 
     # lower discount to prefer immediate rewards
-    answerDiscount = 0.1
+    answerDiscount = 0.9
     answerNoise = 0.2
     # higher negative living reward to discourage lingering
-    answerLivingReward = -10.0
+    answerLivingReward = -2.5
 
     return answerDiscount, answerNoise, answerLivingReward
 
@@ -41,12 +41,11 @@ def question3b():
     
     prefer the close exit (+1), but avoiding the cliff (-10)
     """
-
     # lower discount to prefer immediate rewards
-    answerDiscount = 0.1
+    answerDiscount = 0.2
     answerNoise = 0.2
     # slightly higher negative living reward to encourage avioding the cliff
-    answerLivingReward = -1.0
+    answerLivingReward = 0.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
@@ -57,10 +56,11 @@ def question3c():
     prefer the distant exit (+10), risking the cliff (-10)
     """
 
-    answerDiscount = 0.9
-    answerNoise = 0.2
+    # TODO: FIX THIS KAI WTF!!!
+    answerDiscount = 0.75
+    answerNoise = 0.0009
     # higher negative living reward to discourage lingering
-    answerLivingReward = -10.0
+    answerLivingReward = -0.89
 
     return answerDiscount, answerNoise, answerLivingReward
 
@@ -98,13 +98,12 @@ def question6():
 
     train a completely random q-learner with the default learning rate
     on the noiseless BridgeGrid for 50 episodes
-    and observe whether it finds the optimal policy.
+    and observe whether it finds the optimal policy
     """
 
-    answerEpsilon = 0.3
-    answerLearningRate = 0.5
-
-    return answerEpsilon, answerLearningRate
+    # answerEpsilon = 0.3
+    # answerLearningRate = 0.9999999
+    return NOT_POSSIBLE
 
 if __name__ == '__main__':
     questions = [

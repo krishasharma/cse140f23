@@ -81,7 +81,7 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         # retrives the q value for any given state-action pair from the dict
-        # if pair not seen, returns default val of 0.0
+        # if pair not seen, returns default value of 0.0
         return self.qValues.get((state, action), 0.0)
         return 0.0
 
@@ -107,6 +107,7 @@ class QLearningAgent(ReinforcementAgent):
             the value of the best action in the given state
         """
 
+        # get the legal actions of the state
         legalActions = self.getLegalActions(state)
         # if there are no legal actions in the current state (the terminal state)
         if not legalActions:
@@ -182,8 +183,10 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         # calculate the Q-value update using the Q-learning formula
-        sample = reward + self.getDiscountRate() * self.getValue(nextState)
-        self.qValues[(state, action)] = (1 - self.getAlpha()) * self.getQValue(state, action) + self.getAlpha() * sample
+        # where s is sample; autograder char limit 102>100
+        s = reward + self.getDiscountRate() * self.getValue(nextState)
+        a = (1 - self.getAlpha())
+        self.qValues[(state, action)] = (a) * self.getQValue(state, action) + self.getAlpha() * s
 
 
 class PacmanQAgent(QLearningAgent):
@@ -233,9 +236,50 @@ class ApproximateQAgent(PacmanQAgent):
     def __init__(self, index,
             extractor = 'pacai.core.featureExtractors.IdentityExtractor', **kwargs):
         super().__init__(index, **kwargs)
-        self.featExtractor = reflection.qualifiedImport(extractor)
-
+        # adding the emptuy bracket after extractor gets us the features
+        self.featExtractor = reflection.qualifiedImport(extractor)()
+        # initialize a dictionary for the weights like you did prev
+        self.weights = {}
         # You might want to initialize weights here.
+
+    def getQValue(self, state, action):
+        """
+        get the Q-Value for a state-action pair using the approximate Q-function
+        Q(state, action) = w * featureVector????
+        """
+
+        # where tf do we get the weights from??
+        # how do you get the weights???
+        # take each vector, line them up multiply them and then add them up
+        # calculate the Q-value update using the Q-learning formula
+        # pull the features using featExtractor
+        features = self.featExtractor.getFeatures(state, action)
+        qValue = 0.0
+        # iterate throught the features
+        for feature, value in features.items():
+            # calculate the dot product
+            qValue += self.weights.get(feature, 0.0) * value
+        return qValue
+
+    def update(self, state, action, nextState, reward):
+        """
+        update the weights based on the formula
+        w_i = w_i + alpha * (reward + gamma * max(Q(s', a')) - Q(s, a)) * f_i(s, a)
+        """
+
+        # pull the features
+        features = self.featExtractor.getFeatures(state, action)
+        # reward + self.discountRate * nextstate value and then subtract from the state action pair
+        discount = self.getDiscountRate()
+        diff = (reward + discount * self.getValue(nextState) - self.getQValue(state, action))
+        # iterate through features
+        for feature, value in features.items():
+            # update the weights
+            self.weights[feature] = self.weights.get(feature, 0.0) + self.alpha * diff * value
+        # call the super-class update method
+        # TODO: jam said this but check with the prof kaia???
+        # what does super do ik u call update recursively to update the weights
+        super().update(state, action, nextState, reward)
 
     def final(self, state):
         """
@@ -249,4 +293,5 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # You might want to print your weights here for debugging.
             # *** Your Code Here ***
+            return
             raise NotImplementedError()
